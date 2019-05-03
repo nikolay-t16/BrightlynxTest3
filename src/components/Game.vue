@@ -4,7 +4,7 @@
 			<div v-for="item in row" v-bind:class=item.class v-on:click=onClick(item)>
 			</div>
 		</div>
-		<Timer v-bind:isWin=isWin v-on:start=start></Timer>
+		<Timer ref="timer" v-on:start=start></Timer>
 	</div>
 
 </template>
@@ -27,8 +27,7 @@
 			return {
 				cells: this.cells,
 				selected: null,
-				onClickDisabled: false,
-				isWin: false
+				onClickDisabled: false
 			}
 		},
 		methods: {
@@ -48,7 +47,9 @@
 					this.selected.done();
 					item.done();
 					this.selected = null;
-					this.isWin = this.checkResult();
+					if (this.checkResult()) {
+						this.$refs.timer.win();
+					}
 				} else {
 					this.onClickDisabled = true;
 					var _this = this;
