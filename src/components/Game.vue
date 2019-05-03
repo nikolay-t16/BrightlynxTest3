@@ -3,17 +3,17 @@
 		<div class="row" v-for="row in cells">
 			<div v-for="item in row" v-bind:class=item.class v-on:click=onClick(item)>
 			</div>
-
 		</div>
+		<Timer v-bind:isWin=isWin v-on:start=start></Timer>
 	</div>
 
 </template>
 
 <script>
-
-
+	import Timer from './Timer';
 	export default {
 		name: 'Game',
+		components: {Timer},
 		data: function () {
 			var Cell = function () {
 				var status = 0;
@@ -27,6 +27,9 @@
 				this.hide = function () {
 					if (status != 1)
 						return;
+					this.toDefault();
+				}
+				this.toDefault = function(){
 					status = 0;
 					this.class = defaultClass;
 				}
@@ -60,31 +63,12 @@
 					this.cells[i].push(new Cell());
 				}
 			}
-			this.checkResult = function () {
-				for (var i = 0; i < 4; i++) {
-					for (var j = 0; j < 4; j++) {
-						if (!this.cells[i][j].isDone())
-							return false;
-					}
-				}
-				return true;
+			return {
+				cells: this.cells,
+				selected: null,
+				onClickDisabled: false,
+				isWin: false
 			}
-			this.start = function () {
-				var colors = [0, 1, 2, 3, 4, 5, 6, 7]
-				var colorForRandom = colors.concat(colors);
-				for (var i = 0; i < this.cells.length; i++) {
-					for (var j = 0; j < this.cells[i].length; j++) {
-						var colorIndex = Math.floor(Math.random() * colorForRandom.length);
-						this.cells[i][j].setColor(colorForRandom[colorIndex]);
-						colorForRandom.splice(colorIndex, 1);
-					}
-				}
-			}
-
-			this.start();
-			this.selected = null;
-			this.onClickDisabled = true;
-			return {cells: this.cells}
 		},
 		methods: {
 			onClick: function (item) {
@@ -103,6 +87,7 @@
 					this.selected.done();
 					item.done();
 					this.selected = null;
+					this.isWin = this.checkResult();
 				} else {
 					this.onClickDisabled = true;
 					var _this = this;
@@ -113,6 +98,29 @@
 						_this.selected = null;
 					}, 500);
 				}
+			},
+			start: function () {
+				this.selected = null;
+				this.onClickDisabled = false;
+				var colors = [0, 1, 2, 3, 4, 5, 6, 7]
+				var colorForRandom = colors.concat(colors);
+				for (var i = 0; i < this.cells.length; i++) {
+					for (var j = 0; j < this.cells[i].length; j++) {
+						var colorIndex = Math.floor(Math.random() * colorForRandom.length);
+						this.cells[i][j].setColor(colorForRandom[colorIndex]);
+						this.cells[i][j].toDefault();
+						colorForRandom.splice(colorIndex, 1);
+					}
+				}
+			},
+			checkResult: function () {
+				for (var i = 0; i < 4; i++) {
+					for (var j = 0; j < 4; j++) {
+						if (!this.cells[i][j].isDone())
+							return false;
+					}
+				}
+				return true;
 			}
 
 		}

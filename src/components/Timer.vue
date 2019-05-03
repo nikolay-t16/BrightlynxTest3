@@ -1,13 +1,14 @@
 <template>
 	<form>
 		<button type="button" v-on:click=onClick>Старт</button>
-		<p>{{timeLabel}}</p>
+		<p>{{timeLabel}}</p>{{isWin}}
 	</form>
 </template>
 
 <script>
 	export default {
 		name: "Timer",
+		props:{isWin:Boolean},
 		data: function () {
 			var Timer = function (callBack) {
 				var timeStart;
@@ -28,11 +29,10 @@
 					if (intervalId != null)
 						clearInterval(intervalId);
 				}
-			}
+			};
 			return {
 				timeLabel: "",
 				timer: new Timer(this.onTick)
-
 			};
 		},
 		methods: {
@@ -46,6 +46,9 @@
 				this.timeLabel +=date.getMinutes() +":";
 				this.timeLabel +=date.getSeconds() +":";
 				this.timeLabel +=date.getMilliseconds();
+				if(this.isWin){
+					this.timer.stop();
+				}
 			}
 
 		}
