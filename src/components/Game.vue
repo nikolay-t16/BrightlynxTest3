@@ -10,7 +10,7 @@
 </template>
 
 <script>
-	import Timer from './Timer';
+	import Timer from './Timer.vue';
 	import Cell from './Cell.js';
 
 	export default {
